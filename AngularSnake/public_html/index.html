@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="gApp">
+    <head>
+        <title>Snake</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/angular.min.js"></script>
+        <script src="app/gApp.js"></script>
+        <script src="app/SnakeController.js"></script>
+        <script src="app/SnakeService.js"></script>
+        <link rel="stylesheet" href="css/snake.css"> 
+    </head>
+    <body>
+        {{ctrl.Board}}
+        <div tabindex="0" ng-keyup="ctrl.changeDirection($event)" ng-controller="SnakeController as ctrl">
+            <div class="row" ng-repeat="column in ctrl.Board track by $index">
+                <div id="board" ng-style="{'background': ctrl.boardColorStyle(row)}" ng-repeat="row in column track by $index">    
+                </div>
+            </div>
+            <button ng-click="ctrl.generateSnake()">Genarate Snake</button>
+        </div>
+        
+    </body>
+</html>
