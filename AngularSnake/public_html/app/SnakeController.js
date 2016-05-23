@@ -13,8 +13,9 @@ angular.module('gApp').controller('SnakeController',['SnakeService',function(Sna
         self.boardColorStyle = SnakeService.boardColorStyle;
         self.generateFruit = SnakeService.generateFruit;
         self.changeDirection = SnakeService.changeDirection;
-        self.generateSnake = SnakeService.generateSnake;
+        self.startGame = SnakeService.startGame;
+        self.game = SnakeService.game;
         SnakeService.initBoard();
-        SnakeService.update();
+        
         return self;
 }]);

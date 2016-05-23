@@ -9,6 +9,7 @@ and open the template in the editor.
         <title>Snake</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <script src="js/angular.min.js"></script>
         <script src="app/gApp.js"></script>
         <script src="app/SnakeController.js"></script>
@@ -17,13 +18,25 @@ and open the template in the editor.
     </head>
     <body>
         {{ctrl.Board}}
-        <div tabindex="0" ng-keyup="ctrl.changeDirection($event)" ng-controller="SnakeController as ctrl">
+        <div class="col-md-4"  tabindex="0" ng-keyup="ctrl.changeDirection($event)" ng-controller="SnakeController as ctrl">
             <div class="row" ng-repeat="column in ctrl.Board track by $index">
                 <div id="board" ng-style="{'background': ctrl.boardColorStyle(row)}" ng-repeat="row in column track by $index"> 
                 </div>
             </div>
-            <button ng-click="ctrl.generateSnake()">Genarate Snake</button>
+            <button ng-click="ctrl.startGame()" >Start game</button>
         </div>
-        
+        <div class="row" ng-controller="SnakeController as ctrl">
+            <div class="col-md-4">
+                <h3>Welcome to AngularJS Snake game! For moving snake please use arrows. I hope you will enjoy this!</h3>
+                <label for="singleSelect"> Chose difficult: </label><br>
+                <select name="singleSelect" ng-model="ctrl.game.gameSpeed" ng-disabled="ctrl.game.isGameSpeedSet">
+                    <option value=1>1</option>
+                    <option value=3>2</option>
+                    <option value=3>3</option>
+                    <option value=4>4</option>
+                    <option value=5>5</option>
+                </select><br>
+                <h4>Score:{{ctrl.game.points}}</h4> </div>
+        </div>
     </body>
 </html>

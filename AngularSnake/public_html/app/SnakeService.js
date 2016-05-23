@@ -23,6 +23,13 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
         direction: self.direction.Down
     };
 
+    self.game = {
+        points: 0,
+        isStarted: false,
+        gameSpeed: 1,
+        isGameSpeedSet: false
+    };
+
     self.boardSize = 20;
 
     self.Board = [];
@@ -40,14 +47,14 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
     self.generatePositionFruit = function ()
     {
         if (!self.fruit.isSet) {
-            self.fruit.x = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
-            self.fruit.y = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.fruit.x = Math.floor(Math.random() * (19 - 0 + 0)) + 0;
+            self.fruit.y = Math.floor(Math.random() * (19 - 0 + 0)) + 0;
             self.Board[self.fruit.x][self.fruit.y] = 'fruit';
             self.fruit.isSet = !self.fruit.isSet;
         } else {
             self.Board[self.fruit.x][self.fruit.y] = '';
-            self.fruit.x = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
-            self.fruit.y = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.fruit.x = Math.floor(Math.random() * (19 - 0 + 0)) + 0;
+            self.fruit.y = Math.floor(Math.random() * (19 - 0 + 0)) + 0;
             self.Board[self.fruit.x][self.fruit.y] = 'fruit';
         }
     };
@@ -70,11 +77,13 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
 
     };
     self.update = function () {
-        self.drawSnakeOnBoard();
         if (!self.drawSnake()) {
             $timeout.cancel(gameover);
+            self.game.isStarted = false;
+            self.game.isGameSpeedSet = false;
+            self.game.points = 0;
         } else {
-            var gameover = $timeout(self.update, 150);
+            var gameover = $timeout(self.update, 400 / self.game.gameSpeed);
         }
     };
 
@@ -98,7 +107,6 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
             self.snake.position[i].x = self.snake.position[i - 1].x;
         }
         if (self.snake.direction === self.direction.Left) {
-            ;
             self.snake.position[0].y -= 1;
         } else if (self.snake.direction === self.direction.Up) {
             self.snake.position[0].x -= 1;
@@ -122,10 +130,8 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
 
     self.detectColisionWithBoard = function () {
         if (self.snake.position[0].x < 0 || self.snake.position[0].y < 0) {
-            console.log('gameover');
             return true;
         } else if (self.snake.position[0].x > 19 || self.snake.position[0].y > 19) {
-            console.log('gameover');
             return true;
         } else
             return false;
@@ -137,6 +143,7 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
             newTail.x = self.fruit.x;
             newTail.y = self.fruit.y;
             self.generatePositionFruit();
+            self.countPoints();
             self.snake.position.push(newTail);
         }
     };
@@ -148,15 +155,38 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
             }
         }
     };
-
-    self.generateSnake = function () {
-        self.drawSnake();
-        self.generatePositionFruit();
+    
+    self.startGame = function () {
+        if (!self.game.isStarted) {
+            self.snake.position = [{x: 7, y: 5}, {x: 6, y: 5}, {x: 5, y: 5}];
+            self.snake.direction = self.direction.Down;
+            self.initBoard();
+            self.drawSnake();
+            self.generatePositionFruit();
+            self.game.isStarted = true;
+            self.game.isGameSpeedSet = true;
+            self.update();
+        }
     };
 
-    self.drawSnakeOnBoard = function () {
-        for (var i = 0; i < self.snake.position.length; i++) {
-            self.Board[self.snake.position[i].x][self.snake.position[i].y] = 'snake';
+    self.countPoints = function () {
+        var x = parseInt(self.game.gameSpeed);
+        switch (x) {
+            case 1:
+                self.game.points += 3;
+                break;
+            case 2:
+                self.game.points += 5;
+                break;
+            case 3:
+                self.game.points += 6;
+                break;
+            case 4:
+                self.game.points += 8;
+                break;
+            case 5:
+                self.game.points += 10;
+                break;
         }
     };
 
