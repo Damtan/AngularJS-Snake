@@ -19,7 +19,7 @@ and open the template in the editor.
         {{ctrl.Board}}
         <div tabindex="0" ng-keyup="ctrl.changeDirection($event)" ng-controller="SnakeController as ctrl">
             <div class="row" ng-repeat="column in ctrl.Board track by $index">
-                <div id="board" ng-style="{'background': ctrl.boardColorStyle(row)}" ng-repeat="row in column track by $index">    
+                <div id="board" ng-style="{'background': ctrl.boardColorStyle(row)}" ng-repeat="row in column track by $index"> 
                 </div>
             </div>
             <button ng-click="ctrl.generateSnake()">Genarate Snake</button>

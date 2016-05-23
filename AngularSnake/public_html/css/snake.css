@@ -16,3 +16,7 @@ and open the template in the editor.
     background: whitesmoke;
     display: inline-block;
 }
+
+#gameover{
+     background: red;
+}

@@ -14,14 +14,13 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
     };
     self.fruit = {
         isSet: false,
-        position: [{x: 5, y: 5}, {x: 6, y: 5}],
-        direction: self.direction.Left
+        x: 9,
+        y: 5
     };
 
     self.snake = {
-        isSet: false,
-        position: [{x: 10, y: 10}, {x: 11, y: 10}],
-        direction: self.direction.Left
+        position: [{x: 7, y: 5}, {x: 6, y: 5}, {x: 5, y: 5}],
+        direction: self.direction.Down
     };
 
     self.boardSize = 20;
@@ -32,15 +31,25 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
         for (var i = 0; i < self.boardSize; i++) {
             self.Board[i] = [];
             for (var j = 0; j < self.boardSize; j++) {
-                self.Board[i][j] = '';
+                self.Board[i][j] = j;
             }
+            self.Board[i][0] = i;
         }
     };
 
-    self.generatePosition = function ()
+    self.generatePositionFruit = function ()
     {
-        self.police.position.x = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
-        self.police.position.y = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+        if (!self.fruit.isSet) {
+            self.fruit.x = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.fruit.y = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.Board[self.fruit.x][self.fruit.y] = 'fruit';
+            self.fruit.isSet = !self.fruit.isSet;
+        } else {
+            self.Board[self.fruit.x][self.fruit.y] = '';
+            self.fruit.x = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.fruit.y = Math.floor(Math.random() * (20 - 0 + 0)) + 0;
+            self.Board[self.fruit.x][self.fruit.y] = 'fruit';
+        }
     };
 
     self.fillBoard = function () {
@@ -60,64 +69,92 @@ angular.module('gApp').service('SnakeService', function ($timeout, $window) {
             return 'white';
 
     };
-
     self.update = function () {
-
         self.drawSnakeOnBoard();
-        self.drawFruit();
-        $timeout(self.update, 150);
-    };
-
-    self.changeDirection = function (direction) {
-        if (direction.keyCode === self.direction.Left && self.fruit.direction !== self.direction.Right) {
-            self.fruit.direction = self.direction.Left;
-        } else if (direction.keyCode === self.direction.Up && self.fruit.direction !== self.direction.Down) {
-            self.fruit.direction = self.direction.Up;
-        } else if (direction.keyCode === self.direction.Right && self.fruit.direction !== self.direction.Left) {
-            self.fruit.direction = self.direction.Right;
-        } else if (direction.keyCode === self.direction.Down && self.fruit.direction!== self.direction.Up) {
-            self.fruit.direction = self.direction.Down;
+        if (!self.drawSnake()) {
+            $timeout.cancel(gameover);
+        } else {
+            var gameover = $timeout(self.update, 150);
         }
     };
 
-    self.drawFruit = function () {
-            self.Board[self.fruit.position[1].x][self.fruit.position[1].y] = '';
-            self.fruit.position[1].y = self.fruit.position[0].y;
-            self.fruit.position[1].x = self.fruit.position[0].x;
-            if (self.fruit.direction === self.direction.Left) {
-                //   self.Board[newTail.x][newTail.y] = '';
-                //newTail.y = self.fruit.position[0].y;
-
-                self.fruit.position[0].y -= 1;
-            } else if (self.fruit.direction === self.direction.Up) {
-                // self.Board[newTail.x][newTail.y] = '';
-                // newTail.x = self.fruit.position[0].x;
-                self.fruit.position[0].x -= 1;
-            } else if (self.fruit.direction === self.direction.Right) {
-                // self.Board[newTail.x][newTail.y] = '';
-                //  newTail.y = self.fruit.position[0].y;
-                self.fruit.position[0].y += 1;
-            } else if (self.fruit.direction === self.direction.Down) {
-                // self.Board[newTail.x][newTail.y] = '';
-                // newTail.x = self.fruit.position[0].x;
-                self.fruit.position[0].x += 1;
-            }
-            self.Board[self.fruit.position[0].x][self.fruit.position[0].y] = 'fruit';
-            self.Board[self.fruit.position[1].x][self.fruit.position[1].y] = 'fruit';
+    self.changeDirection = function (direction) {
+        if (direction.keyCode === self.direction.Left && self.snake.direction !== self.direction.Right) {
+            self.snake.direction = self.direction.Left;
+        } else if (direction.keyCode === self.direction.Up && self.snake.direction !== self.direction.Down) {
+            self.snake.direction = self.direction.Up;
+        } else if (direction.keyCode === self.direction.Right && self.snake.direction !== self.direction.Left) {
+            self.snake.direction = self.direction.Right;
+        } else if (direction.keyCode === self.direction.Down && self.snake.direction !== self.direction.Up) {
+            self.snake.direction = self.direction.Down;
+        }
     };
 
+    self.drawSnake = function () {
+// Note: first loop is for change position, tail chase head
+        for (var i = self.snake.position.length - 1; i >= 1; i--) {
+            self.Board[self.snake.position[i].x][self.snake.position[i].y] = '';
+            self.snake.position[i].y = self.snake.position[i - 1].y;
+            self.snake.position[i].x = self.snake.position[i - 1].x;
+        }
+        if (self.snake.direction === self.direction.Left) {
+            ;
+            self.snake.position[0].y -= 1;
+        } else if (self.snake.direction === self.direction.Up) {
+            self.snake.position[0].x -= 1;
+        } else if (self.snake.direction === self.direction.Right) {
+            self.snake.position[0].y += 1;
+        } else if (self.snake.direction === self.direction.Down) {
+            self.snake.position[0].x += 1;
+        }
+        if (self.detectColisionWithBoard() || self.detectColisionWithSnake()) {
+            return false;
+        } else {
+            self.detectColisionWithFruit();
+            self.Board[self.snake.position[0].x][self.snake.position[0].y] = 'snake';
+            // Note: draw on main board
+            for (var i = 0; i <= self.snake.position.length - 1; i++) {
+                self.Board[self.snake.position[i].x][self.snake.position[i].y] = 'snake';
+            }
+            return true;
+        }
+    };
+
+    self.detectColisionWithBoard = function () {
+        if (self.snake.position[0].x < 0 || self.snake.position[0].y < 0) {
+            console.log('gameover');
+            return true;
+        } else if (self.snake.position[0].x > 19 || self.snake.position[0].y > 19) {
+            console.log('gameover');
+            return true;
+        } else
+            return false;
+    };
+
+    self.detectColisionWithFruit = function () {
+        var newTail = {};
+        if (self.snake.position[0].x === self.fruit.x && self.snake.position[0].y === self.fruit.y) {
+            newTail.x = self.fruit.x;
+            newTail.y = self.fruit.y;
+            self.generatePositionFruit();
+            self.snake.position.push(newTail);
+        }
+    };
+
+    self.detectColisionWithSnake = function () {
+        for (var i = 1; i < self.snake.position.length; i++) {
+            if (self.snake.position[0].x === self.snake.position[i].x && self.snake.position[0].y === self.snake.position[i].y) {
+                return true;
+            }
+        }
+    };
 
     self.generateSnake = function () {
-        self.Board[self.fruit.position[0].x][self.fruit.position[0].y] = 'fruit';
-        self.Board[self.fruit.position[1].x][self.fruit.position[1].y] = 'fruit';
-        var head = {x: 10, y: 10};
-        var tail = {x: 13, y: 10};
-        self.snake.position.push(head);
-        self.snake.position.push(tail);
+        self.drawSnake();
+        self.generatePositionFruit();
     };
 
     self.drawSnakeOnBoard = function () {
-        var snakeLength = self.snake.position[self.snake.position.length - 1].x - self.snake.position[0].x;
         for (var i = 0; i < self.snake.position.length; i++) {
             self.Board[self.snake.position[i].x][self.snake.position[i].y] = 'snake';
         }
