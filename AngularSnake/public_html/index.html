@@ -23,7 +23,7 @@ and open the template in the editor.
                 <div id="board" ng-style="{'background': ctrl.boardColorStyle(row)}" ng-repeat="row in column track by $index"> 
                 </div>
             </div>
-            <button ng-click="ctrl.startGame()" >Start game</button>
+
         </div>
         <div class="row" ng-controller="SnakeController as ctrl">
             <div class="col-md-4">
@@ -36,7 +36,8 @@ and open the template in the editor.
                     <option value=4>4</option>
                     <option value=5>5</option>
                 </select><br>
-                <h4>Score:{{ctrl.game.points}}</h4> </div>
+                <h4>Score:{{ctrl.game.points}}</h4>
+                <button ng-click="ctrl.startGame()" >Start game</button></div>
         </div>
     </body>
 </html>
